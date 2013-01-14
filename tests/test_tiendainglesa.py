@@ -1,8 +1,5 @@
 import unittest
-import sys
-
-sys.path.append('../../../../')
-from parser.tiendainglesa import TiendaInglesaParser
+from tracker.parser.tiendainglesa import TiendaInglesaParser
 
 class TestTiendaInglesaParser(unittest.TestCase):
 

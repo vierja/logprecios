@@ -1,8 +1,5 @@
 import unittest
-import sys
-
-sys.path.append('../../../../')
-from parser.devoto import DevotoParser
+from tracker.parser.devoto import DevotoParser
 
 class TestDevotoParser(unittest.TestCase):
 

@@ -1,8 +1,5 @@
 import unittest
-import sys
-
-sys.path.append('../../../../')
-from parser.multiahorro import MultiAhorroParser
+from tracker.parser.multiahorro import MultiAhorroParser
 
 class TestMultiAhorroParser(unittest.TestCase):
 
