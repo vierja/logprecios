@@ -1,0 +1,4 @@
+cssselect==0.7.1
+lxml==3.1beta1
+pyquery==1.2.4
+wsgiref==0.1.2
