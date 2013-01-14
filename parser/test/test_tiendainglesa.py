@@ -11,7 +11,6 @@ class TestTiendaInglesaParser(unittest.TestCase):
         site_value = p.get_value(url)
         assert site_value == value
 
-
     def test_leche(self):
         self.assertValue("http://www.tinglesa.com.uy/producto.php?idarticulo=1531", 15.5)
 
