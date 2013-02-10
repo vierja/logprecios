@@ -1,5 +1,5 @@
 import times
-import unicodecsv as csv
+import csv
 import os
 
 from parser.devoto import DevotoParser
