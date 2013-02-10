@@ -1,4 +1,8 @@
 cssselect==0.7.1
 lxml==3.1beta1
 pyquery==1.2.4
+python-dateutil==2.1
+pytz==2012j
+six==1.2.0
+times==0.6
 wsgiref==0.1.2
