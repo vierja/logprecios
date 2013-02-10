@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Producto {{ product.name }}{% endblock %}
+{% block content %}
+<div class="row">
+	<div class="nine columns">
+		<h4 class="subheader">Producto {{ product.name }} <small>desde {{ product.pub_date.strftime('%Y-%m-%d') }} [<a href="{{ product.url }}">link</a>]</small></h4>
+		<div class="panel">
+			<img src="{{product.original_img}}" />
+		</div>
+		<table class="twelve">
+			<thead>
+				<tr>
+					<th>Precio</th>
+					<th>Moneda</th>
+					<th>Fecha</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for price_log in product.price_logs %}
+				<tr>
+					<td>{{price_log.price}}</td>
+					<td>{{price_log.currency}}</td>
+					<td>{{price_log.fetched_date}}</td>
+				</tr>
+				{% endfor %}
+		  </tbody>
+		</table>
+	</div>
+	<div class="three columns">
+		<h6>Productos similares</h6>
+	</div>
+</div>
+{% endblock %}
