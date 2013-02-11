@@ -1,0 +1,2 @@
+concurrency: web=1,redis=1,worker=2,scheduler=1
+port: 5000
