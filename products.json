@@ -1,0 +1,44 @@
+/api/v1.0/products/:id:
+
+{
+	"id": "1",
+	"name":"Leche Conaprole 1L",
+	"images":[
+		{
+			"height": 720,
+			"width": 1280,
+			"source": "http://.../img/product/112303.jpg"
+		}
+	],
+	"created_time": "2012-12-29T21:38:41+0000", 
+	"updated_time": "2012-12-29T21:38:48+0000", 
+	"source":{
+		"id": "2",
+		"name": "Tienda Inglesa",
+		"country": "UY"
+	},
+	"brand":{
+		"id": "2",
+		"name": "Conaprole"
+	},
+	"category":{
+		"id": "2",
+		"name": "Canasta basica"
+	},
+	"price_logs":{
+		"data":[
+			{
+				"id": "2345676543",
+				"created_time": "2012-04-23T12:49:38+0000",
+				"amount": "12.00",
+				"currency": "UYP"
+			},
+			{
+				"id": "614123323",
+				"created_time": "2012-04-23T12:49:38+0000",
+				"amount": "14.00",
+				"currency": "UYP"
+			}
+		]
+	}
+}
