@@ -1,6 +1,7 @@
 from datetime import datetime
 from trackerapp import db
 from tracker.tracker import get_parser
+from urlparse import urlparse
 
 ######### MODELS
 
@@ -24,6 +25,17 @@ class ProductCategory(db.Model):
     def __repr__(self):
         return "<ProductCategory('%s')>" % self.name
 
+class Source(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    domain = db.Column(db.String, unique=True)
+
+    def __init__(self, domain=None):
+        self.domain = domain
+
+    def __repr__(self):
+        return "<Source('%s')>" % self.domain
+
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -34,6 +46,10 @@ class Product(db.Model):
     product_category = db.relationship('ProductCategory', backref=db.backref('products', order_by=id))
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'))
     brand = db.relationship('Brand', backref=db.backref('products', order_by=id))
+
+    source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+    source = db.relationship('Source', backref=db.backref('products', order_by=id))
+
     original_img = db.Column(db.String)
 
     def __init__(self, url=None):
@@ -48,6 +64,17 @@ class Product(db.Model):
         data = parser.get_data()
         self.name = data['name']
         self.original_img = data['image_url']
+
+        #Busco o creo source
+        hostname = urlparse(self.url).hostname
+        if hostname.startswith('www.'):
+            hostname = hostname[4:]
+
+        source = Source.query.filter_by(domain=hostname).first()
+        if source == None:
+            source = Source(domain=hostname)
+            db.session.add(source) #el commit se hace cuando se guarda Product.
+        self.source = source
 
     def get_price(self):
         parser = get_parser(self.url)

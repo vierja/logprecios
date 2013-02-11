@@ -23,6 +23,8 @@
   <link rel="stylesheet" href="/static/stylesheets/app.css">
 
   <script src="/static/javascripts/modernizr.foundation.js"></script>
+  <script src="/static/moment.min.js"></script>
+  <script src="/static/es.js"></script>
   <script src="/static/javascripts/mustache.js"></script>
   <script src="/static/javascripts/jquery.js"></script>
   <style type="text/css">
@@ -58,8 +60,14 @@
         </ul>
       </section>
     </nav>
-
   </div>
+  {% block breadcrumbs %}
+  <div class="row">
+    <ul class="breadcrumbs">
+      <li><a href="/"><span class="current">Inicio</span></a></li>
+    </ul>
+  </div>
+  {% endblock %}
   {% block content %}{% endblock %}
   <div id="copyright">
     <div class="row">
