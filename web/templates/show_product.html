@@ -11,7 +11,7 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-	<div class="nine columns">
+	<div class="twelve columns">
 		<div class="row">
 			<div class="six columns">
 				<ul class="pricing-table round">
@@ -48,29 +48,47 @@
 			</div>
 		</div>
 		<hr />
-		<table class="six columns">
-			<thead>
-				<tr>
-					<th>Fecha</th>
-					<th>Precio</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for price_log in product.price_logs|sort(reverse=True) %}
-				<tr>
-					<td><span class="from-now" data-date="{{price_log.fetched_date}} +0000"></span></td>
-					<td>{{price_log.currency}} {{price_log.price | float}}</td>
-					<td>+ 10%</td>
-					
-				</tr>
-				{% endfor %}
-		  </tbody>
-		</table>
+		<div class="row">
+			<div class="twelve columns">
+				<ul class="inline-list">
+					<li><a href="#">Descargar como CSV</a></li>
+					<li><a href="#">Descargar como XML</a></li>
+				</ul>
+				<table class="twelve">
+					<thead>
+						<tr>
+							<th>Fecha</th>
+							<th>Precio</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for price_log in product.price_logs|sort(attribute="fetched_date", reverse=True) %}
+						<tr>
+							<td><span class="from-now" data-date="{{price_log.fetched_date}} +0000"></span></td>
+							<td>{{price_log.currency}} {{price_log.price | float}}</td>
+							{% set float_change = price_log.change | float %}
+							<td>
+								{% if float_change ==  0%}
+								<span class="price-change-neutral">
+								{% elif float_change > 0 %}
+								<span class="price-change-positive">
+								{% else %}
+								<span class="price-change-negative">
+								{% endif %}
+									{{ "%.2f" | format(float_change) }}%
+								</span>
+							</td>
+						</tr>
+						{% endfor %}
+				  </tbody>
+				</table>
+			</div>
+		</div>
 	</div>
-	<div class="three columns">
+<!-- 	<div class="three columns">
 		<h6>Productos similares</h6>
-	</div>
+	</div> -->
 </div>
 <script type="text/javascript">
 	moment.lang("es");

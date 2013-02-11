@@ -1,5 +1,6 @@
 from flask.ext.script import Manager
 from trackerapp import app, db, scheduler
+from populate import create_products_with_prices
 
 manager = Manager(app)
 
@@ -26,6 +27,18 @@ def canceljobs():
 	for job in list_of_job_instances:
 		print "Job %s cancelled" %job.id
 		scheduler.cancel(job)
+
+@manager.command
+def populatedb():
+	"""Adds items with random prices to DB"""
+	create_products_with_prices()
+
+@manager.command
+def resettest():
+	dropdb()
+	initdb()
+	populatedb()
+
 
 if __name__ == '__main__':
     manager.run()

@@ -32,6 +32,16 @@
 	color: #1FC440
 }
 
+.price-change-neutral{
+
+}
+.price-change-positive{
+	color: #DA5454;
+}
+.price-change-negative{
+	color: #1FC440
+}
+
 
 /* -----------------------------------------
    Page Name 2

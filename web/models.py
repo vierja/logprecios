@@ -52,9 +52,12 @@ class Product(db.Model):
 
     original_img = db.Column(db.String)
 
-    def __init__(self, url=None):
+    def __init__(self, url=None, pub_date=None):
         self.url = url
-        self.pub_date = datetime.utcnow()
+        if pub_date:
+            self.pub_date = pub_date
+        else:
+            self.pub_date = datetime.utcnow()
 
     def __repr__(self):
         return "<Product('%s', '%s')>" % (self.name, self.url)
@@ -87,12 +90,26 @@ class PriceLog(db.Model):
     fetched_date = db.Column(db.DateTime)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product = db.relationship('Product', backref=db.backref('price_logs', order_by=id))
+    change = db.Column(db.Numeric)
 
-    def __init__(self, price=None, currency=None, product=None):
+    def __init__(self, price=None, currency=None, product=None, fetched_date=None):
+        previous_log = PriceLog.query.filter_by(product=product).order_by(db.desc(PriceLog.fetched_date)).limit(1).all()
+        # previous_log = product.price_logs.order_by(PriceLog.fetched_date.desc()).first()
+        if previous_log:
+            previous_log = previous_log[0]
+            print "Se encuentra previous_log:" ,previous_log
+            self.change = ((price - previous_log.price) / previous_log.price) * 100
+            print "Change:", self.change
+        else:
+            self.change = 0
         self.price = price
         self.currency = currency
-        self.fetched_date = datetime.utcnow()
         self.product = product
+        if fetched_date:
+            self.fetched_date = fetched_date
+        else:
+            self.fetched_date = datetime.utcnow()
+
 
     def __repr__(self):
         return "<PriceLog('%s', '%s')>" % (self.product.name, self.price)
