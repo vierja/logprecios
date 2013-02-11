@@ -1,12 +1,8 @@
-Tracker de Inflación en Uruguay
-===============================
+Tracker de Inflación
+====================
 
-Cada semana, se corre el programa de forma automática y se guardan los datos de los precios de distintos productos de distintas categorías.
-Y cada semana se actualiza la página autogenerada con estos datos.
+WORK IN PROGRESS
 
-Pueden ver los datos sin procesar en `data/`.
-
-También pueden ver el código utilizado para obtener y parsear los datos de las distintas páginas.
-
-
+Sitio web para trackear los precios de distintos productos de distintas fuentes (supermercados, restaurantes).
+Diariamente los precios son actualizados para poder ver la evolución real de los precios.
 
