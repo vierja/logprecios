@@ -1,3 +1,5 @@
+config.cfg
+
 *.py[cod]
 
 # C extensions
