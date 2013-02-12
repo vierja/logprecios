@@ -11,7 +11,7 @@
   <div class="twelve columns">
 	<h2>Bienvenidos al tracker de precios.</h2>
 	<p><a href="{{ url_for('new_product') }}">Agregar un nuevo producto</a>.</p>
-	{{number_of_logs}} logs obtenidos de {{number_of_products}} productos.
+	<span class="number-of-logs">{{number_of_logs}}</span> logs obtenidos de <span class="number-of-products">{{number_of_products}}</span> productos.
 	<hr />
 	<h3 class="feature-header">Últimos 25 productos actualizados</h3>
 		{% for product in products %}

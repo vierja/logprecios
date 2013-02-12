@@ -70,10 +70,7 @@
 	$('.product-panel').click(function(){
 		window.location.href = $(this).find(".product-link").attr("href")
 	});
-	moment.lang("es");
-	$(".from-now").each(function(){
-		$(this).html(moment($(this).attr("data-date"), "YYYY-MM-DD HH:mm:ss.SSS Z").fromNow());	
-	});
+
 	setTimeout(function() {
 	  if (location.hash) {
 		window.scrollTo(0, 0);
