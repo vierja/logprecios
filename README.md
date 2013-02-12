@@ -1,4 +1,4 @@
-Tracker de Inflación
+LogPrecios.com
 ====================
 
 WORK IN PROGRESS
