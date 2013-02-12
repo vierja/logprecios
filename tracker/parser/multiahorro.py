@@ -25,7 +25,9 @@ class MultiAhorroParser(Parser):
             product_name += " 1 Kg"
         incomplete_link = d("#ctl00_ContentPlaceHolder1_imgProductImage").attr("src")
         clean_link = urljoin(self.url, incomplete_link[1:])
-        return {'name':product_name, "image_url": clean_link}
+        #Categorias
+        categorias = d("#ctl00_ContentPlaceHolder1_lblMap").text().split(" -> ")[1:-1]
+        return {'name':product_name, "image_url": clean_link, "categories": categorias}
 
     def get_price(self):
         """

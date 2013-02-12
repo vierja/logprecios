@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Nuevo producto{% endblock %}
 {% block head %}
-    {{ super() }}
-    <style type="text/css">
-        .important { color: #C91C0D; }
-    </style>
+		{{ super() }}
+		<style type="text/css">
+				.important { color: #C91C0D; }
+		</style>
 {% endblock %}
 {% block content %}
 <div class="row">
-  <div class="twelve columns">
-    <h2>Agrega un nuevo producto.</h2>
+	<div class="twelve columns">
+		<h2 class="feature-header">Agrega un nuevo producto.</h2>
 	<form action="" method="post">
-		<label>Url</label>
+		<label>URL:</label>
 		<input type="text" name="url" class="twelve" placeholder="por ejemplo: http://www.tinglesa.com.uy/producto.php?idarticulo=14610" />
 		<input type="submit" class="button" value="Trackear precio" />
 	</form>
-    <hr />
-  </div>
+		<hr />
+	</div>
 </div>
 {% endblock %}

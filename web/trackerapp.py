@@ -1,10 +1,11 @@
 from flask import Flask, request, url_for, redirect, g, session, flash, \
-     abort, render_template
+     abort, render_template, Response
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.oauth import OAuth
 from rq import use_connection
 from rq_scheduler import Scheduler
 from datetime import datetime
+from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
@@ -12,6 +13,7 @@ db = SQLAlchemy(app)
 oauth = OAuth()
 use_connection() # Use RQ's default Redis connection
 scheduler = Scheduler()
+#toolbar = DebugToolbarExtension(app)
 
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
@@ -30,13 +32,16 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 from jobs.price_job import update_price
-from models import Product, User, Paste
+from models import Product, User, Paste, ProductCategory, PriceLog
 
 ######### VIEWS
 
 @app.route('/')
 def homepage():
-    return render_template('home.html')
+    products = Product.query.order_by(db.desc(Product.updated_date)).limit(25).all()
+    number_of_logs = PriceLog.query.count()
+    number_of_products = Product.query.count()
+    return render_template('home.html', products=products, number_of_logs=number_of_logs, number_of_products=number_of_products)
 
 @app.route('/new-product/', methods=['GET', 'POST'])
 def new_product():
@@ -57,10 +62,35 @@ def new_product():
         return redirect(url_for('show_product', product_id=product.id))
     return render_template('new_product.html')
 
-@app.route('/product/<int:product_id>')
-def show_product(product_id):
+
+@app.route('/product/<int:product_id>', defaults={'extension': None})
+@app.route('/product/<int:product_id>.<extension>')
+def show_product(product_id, extension=None):
     product = Product.query.get_or_404(product_id)
-    return render_template('show_product.html', product=product)
+    if extension is None:
+        return render_template('show_product.html', product=product)
+    if extension == "json":
+        return Response(product.to_json(),  mimetype='application/json')
+    if extension == "csv":
+        return Response(product.to_csv_generator(),  mimetype='text/csv')
+
+    return redirect(url_for('show_product', product_id=product_id, extension=None))
+
+@app.route('/product/<int:product_id>/price_logs.json')
+def get_price_logs(product_id):
+    product = Product.query.get_or_404(product_id)
+    return Response(product.price_logs_to_json(), mimetype='application/json')
+
+
+@app.route('/category/<category_slug>')
+def show_category(category_slug):
+    category = ProductCategory.query.filter_by(slug=category_slug).first()
+    if category is None:
+        return abort(404)
+
+    print category
+    return render_template('show_category.html', category=category)
+
 
 # @app.route('/', methods=['GET', 'POST'])
 # def new_paste():

@@ -4,6 +4,11 @@
   var $doc = $(document),
       Modernizr = window.Modernizr;
 
+  moment.lang("es");
+  $(".from-now").each(function(){
+    $(this).html(moment($(this).attr("data-date"), "YYYY-MM-DD HH:mm:ss.SSS Z").fromNow()); 
+  });
+
   $(document).ready(function() {
     $.fn.foundationAlerts           ? $doc.foundationAlerts() : null;
     $.fn.foundationButtons          ? $doc.foundationButtons() : null;

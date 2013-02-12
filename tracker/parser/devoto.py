@@ -20,7 +20,10 @@ class DevotoParser(Parser):
         product_name = d("h1").text()
         incomplete_link = d("img[class=imgproducto]").attr("src")
         clean_link = "http://" + urlparse(self.url).hostname + incomplete_link
-        return {'name':product_name, "image_url": clean_link}
+        #Categorias
+        categories = d(".barnavega").text().split("/")[1:-1]
+        categories = [a.strip() for a in categories]
+        return {'name':product_name, "image_url": clean_link, "categories": categories}
 
     def get_price(self):
         """

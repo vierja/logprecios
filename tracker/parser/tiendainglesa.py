@@ -21,7 +21,10 @@ class TiendaInglesaParser(Parser):
         product_name = d(".prod:first").find("h2").text()
         dirty_link = d(".contenedor_foto_producto>a").attr("href")
         clean_link = re.search("\(\'(?P<url>https?://[^\s]+)\',", dirty_link).group("url")
-        return {'name':product_name, "image_url": clean_link}
+        #categories
+        categorias = d(".btn_navegacion").find("td:nth-child(2)").text().split('/')[1:-1]
+        categorias = [a.strip() for a in categorias]
+        return {'name':product_name, "image_url": clean_link, "categories": categorias}
 
     def get_price(self):
         """

@@ -12,24 +12,68 @@
 /* -----------------------------------------
    Shared Styles
 ----------------------------------------- */
+body{
+	background: url(/static/images/gradient_squares.png) repeat;
+}
+.top-bar { background: #788697; }
+.contain-to-grid { background: #788697;}
+.top-bar ul > li a:not(.button){
+	color:#A5AEB9;
+	color:rgba(255, 255, 255, 0.89);
+}
+.top-bar ul > li:not(.name):hover, .top-bar ul > li:not(.name).active {
+	background: #59616B;
+}
 
-.top-bar { background: #333333; }
-.contain-to-grid { background: #333333; }
+a{
+	color:#E66161;
+}
+a:hover {
+	color: #A7130D;
+}
+.label {
+	padding: 5px 12px 6px;
+	color: white;
+	background: #ABCAD3;
+}
+
+.feature-header{
+	color: #C2C2C2;
+	text-shadow: -1px -1px #7E7E7E;
+	margin-left: 10px;
+}
 
 /* -----------------------------------------
    Product
 ----------------------------------------- */
+.product-id {
+	color: #A3A3A3;
+}
+.price-currency {
+	color: #727171;
+}
 
 .big-percentage{
 	font-size: 30px;
+	padding-left: 20px;
 }
 
 .percentage-positive{
 	color: #DA5454;
+	background:url(/static/images/up_red.png) center left no-repeat;
+	background-size: 20px 20px;
 }
 
 .percentage-negative{
-	color: #1FC440
+	color: #1FC440;
+	background:url(/static/images/down_green.png) center left no-repeat;
+	background-size: 20px 20px;
+}
+
+.percentage-neutral{
+	color: #7B7E68;
+	background:url(/static/images/equals_greenish.png) center left no-repeat;
+	background-size: 20px 20px;
 }
 
 .price-change-neutral{
@@ -37,14 +81,47 @@
 }
 .price-change-positive{
 	color: #DA5454;
+	font-weight: bold;
 }
 .price-change-negative{
-	color: #1FC440
+	color: #1FC440;
+	font-weight: bold;
 }
 
+.row-change-positive{
+	background-color: #F5DFDF !important;
+}
+
+.row-change-negative{
+	background-color: #E2F5DF !important;
+}
+
+.more-rows{
+	background: #9DC0CA !important;
+	color: #464646 !important;
+	border-color: #9BC7D5 !important;
+}
+
+.more-rows:hover{
+	background-color: #DAE1E2 !important;
+	-webkit-transition: background-color 0.6s;
+	-moz-transition: background-color 0.6s;
+	cursor: pointer;
+}
 
 /* -----------------------------------------
-   Page Name 2
+   Product list
 ----------------------------------------- */
+.product-panel {
+	background-color: #F2F2F2;
+	-webkit-transition: background-color 0.4s;
+	-moz-transition: background-color 0.4s;
+}
 
+.product-panel:hover {
+	background-color: #DAE1E2;
+	-webkit-transition: background-color 0.6s;
+	-moz-transition: background-color 0.6s;
+	cursor: pointer;
+}
 

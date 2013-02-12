@@ -13,21 +13,43 @@
 <div class="row">
 	<div class="twelve columns">
 		<div class="row">
+			<h3 class="feature-header">Producto <span class="product-id">#{{product.id}}</span></h3>
 			<div class="six columns">
 				<ul class="pricing-table round">
 					<li class="price">{{ product.name }}</li>
 					<li class="bullet-item">{{ product.source.domain }} [<a href="{{ product.url }}">link</a>]</li>
 					<li class="description">agregado <span class="from-now" data-date="{{ product.pub_date }} +0000"></span>, <b>{{product.price_logs|length}}</b> precios</li>
-					<li class="bullet-item"><a href="#">Vegetales</a></li>
+					<li class="bullet-item">
+						{% for category in product.product_categories %}
+						<a href="{{url_for('show_category', category_slug=category.slug)}}"><span class="radius label">{{category.name}}</span></a>
+						{% endfor %}
+
+					</li>
 					<li class="description">
 						<div class="row">	
 							<div class="six columns">
-								<h6 class="subheader">Últimos 3 meses</h6>
-								<span class="big-percentage percentage-negative">-5%</span>
+								<h6 class="subheader">Últimos 90 días</h6>
+								{% if product.three_month_change == 0 %}
+								<span class="big-percentage percentage-neutral">
+								{% elif product.three_month_change > 0 %}
+								<span class="big-percentage percentage-positive">
+								{% else %}
+								<span class="big-percentage percentage-negative">
+								{% endif %}
+									{{ "%.2f" | format(product.three_month_change) }}%
+								</span>
 							</div>
 							<div class="six columns">
 								<h6 class="subheader">Último año</h6>
-								<span class="big-percentage percentage-positive">+120%</span>
+								{% if product.one_year_change == 0 %}
+								<span class="big-percentage percentage-neutral">
+								{% elif product.one_year_change > 0 %}
+								<span class="big-percentage percentage-positive">
+								{% else %}
+								<span class="big-percentage percentage-negative">
+								{% endif %}
+									{{ "%.2f" | format(product.one_year_change) }}%
+								</span>
 							</div>
 						</div>
 					</li>
@@ -35,54 +57,103 @@
 			</div>
 			<div class="six columns">
 				<div class="panel">
-
 					<span class="th"><img src="{{product.original_img}}" /></span>
 					<small>Fuente: {{product.source.domain}}</small>
 				</div>
 			</div>
-
 		</div>
+		<hr />
 		<div class="row">
+			<!-- <h3 class="feature-header">Gráfica</h3> -->
 			<div class="twelve columns">
-				<img src="http://i.imgur.com/Ywos0RV.png" />
+				<div id="container" style="height: 500px; min-width: 500px"></div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<h3 class="feature-header">Estadísticas</h3>
+			<div class="three columns">
+				<div class="panel radius">
+					<h5>Desde el principio</h5>
+					<h6 class="subheader">hace 700 días</h6>
+					<p><span class="original-price">100 <small>hace 100 dias</small></span></p>
+					<p><span class="transition">to</span></p>
+					<p><span class="actual-price">200</span></p>
+				</div>
+			</div>
+			<div class="three columns">
+				<div class="panel radius">
+					<h5>Aumento mensual promedio</h5>
+					<p><span class="">55%</span></p>
+				</div>
+			</div>
+			<div class="three columns">
+				<div class="panel radius">
+					<h5>Aumento promedio misma categorias</h5>
+					<p><span class="">40%</span></p>
+				</div>
+			</div>
+			<div class="three columns">
+				<div class="panel radius">
+					<h5>This is a panel.</h5>
+					<p>Content...</p>
+				</div>
 			</div>
 		</div>
 		<hr />
 		<div class="row">
 			<div class="twelve columns">
+				<h3 class="feature-header">Lista de precios obtenidos</h3>
 				<ul class="inline-list">
-					<li><a href="#">Descargar como CSV</a></li>
-					<li><a href="#">Descargar como XML</a></li>
+					<li><a href="{{url_for('show_product', product_id=product.id, extension='csv')}}">Ver como CSV</a></li>
+					<li><a href="{{url_for('show_product', product_id=product.id, extension='json')}}">Ver como JSON</a></li>
 				</ul>
 				<table class="twelve">
 					<thead>
 						<tr>
 							<th>Fecha</th>
 							<th>Precio</th>
-							<th></th>
+							<th>Variación</th>
 						</tr>
 					</thead>
 					<tbody>
-						{% for price_log in product.price_logs|sort(attribute="fetched_date", reverse=True) %}
-						<tr>
-							<td><span class="from-now" data-date="{{price_log.fetched_date}} +0000"></span></td>
-							<td>{{price_log.currency}} {{price_log.price | float}}</td>
+						{% set price_logs = product.price_logs|sort(attribute="fetched_date", reverse=True) %}
+						{% for price_log in price_logs[:25]%}
 							{% set float_change = price_log.change | float %}
-							<td>
-								{% if float_change ==  0%}
-								<span class="price-change-neutral">
-								{% elif float_change > 0 %}
-								<span class="price-change-positive">
-								{% else %}
-								<span class="price-change-negative">
-								{% endif %}
-									{{ "%.2f" | format(float_change) }}%
-								</span>
-							</td>
-						</tr>
+							{% set float_price = price_log.price | float %}
+							{% if float_change ==  0%}
+							<tr id="{{ price_log.id }}" >
+							{% elif float_change > 0 %}
+							<tr class="row-change-positive" id="{{ price_log.id }}" >
+							{% else %}
+							<tr class="row-change-negative" id="{{ price_log.id }}" >
+							{% endif %}
+								<td><span data-date="{{price_log.fetched_date}} +0000">{{ price_log.fetched_date.strftime('%Y-%m-%d')}}</span></td>
+								<td><span class="price-currency">{{price_log.currency}}</span> {{ "%.2f" | format(float_price) }}</td>
+								
+								<td>
+									{% if float_change ==  0%}
+									<span class="price-change-neutral">
+									{% elif float_change > 0 %}
+									<span class="price-change-positive">
+									{% else %}
+									<span class="price-change-negative">
+									{% endif %}
+										{{ "%.2f" | format(float_change) }}%
+									</span>
+								</td>
+							</tr>
 						{% endfor %}
 				  </tbody>
 				</table>
+				<div class="panel callout more-rows">
+					<div class="row">
+						<div class="two columns centered">
+							Ver mas
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -95,5 +166,43 @@
 	$(".from-now").each(function(){
 		$(this).html(moment($(this).attr("data-date"), "YYYY-MM-DD HH:mm:ss.SSS Z").calendar());	
 	});
+	setTimeout(function() {
+	  if (location.hash) {
+		window.scrollTo(0, 0);
+		$(window).scroll(function(){
+			$(location.hash).animate({
+				'down': +5 
+			});
+		});
+	  }
+	}, 1);
+</script>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+<script type="text/javascript">
+$(function() {
+
+	$.getJSON('{{url_for("get_price_logs", product_id=product.id)}}', function(data) {
+		// Create the chart
+		window.chart = new Highcharts.StockChart({
+			chart : {
+				renderTo : 'container'
+			},
+
+			rangeSelector : {
+				selected : 1
+			},
+			
+			series : [{
+				name : '{{product.id}}',
+				data : data,
+				tooltip: {
+					valueDecimals: 2
+				}
+			}]
+		});
+	});
+
+});
 </script>
 {% endblock %}
