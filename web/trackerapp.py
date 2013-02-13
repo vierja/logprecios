@@ -13,7 +13,7 @@ db = SQLAlchemy(app)
 oauth = OAuth()
 use_connection() # Use RQ's default Redis connection
 scheduler = Scheduler()
-#toolbar = DebugToolbarExtension(app)
+toolbar = DebugToolbarExtension(app)
 
 facebook = oauth.remote_app('facebook',
     base_url='https://graph.facebook.com/',
