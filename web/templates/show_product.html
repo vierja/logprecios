@@ -21,7 +21,7 @@
 					<li class="description">agregado <span class="from-now" data-date="{{ product.pub_date }} +0000"></span>, <b>{{product.price_logs|length}}</b> precios</li>
 					<li class="bullet-item">
 						{% for category in product.product_categories %}
-						<a href="{{url_for('show_category', category_slug=category.slug)}}"><span class="radius label">{{category.name}}</span></a>
+						<a href="/category/{{category.slug}}"><span class="radius label">{{category.name}}</span></a>
 						{% endfor %}
 
 					</li>
@@ -36,7 +36,7 @@
 								{% else %}
 								<span class="big-percentage percentage-negative">
 								{% endif %}
-									{{ "%.2f" | format(product.three_month_change) }}%
+									{{ product.three_month_change }}%
 								</span>
 							</div>
 							<div class="six columns">
@@ -48,7 +48,7 @@
 								{% else %}
 								<span class="big-percentage percentage-negative">
 								{% endif %}
-									{{ "%.2f" | format(product.one_year_change) }}%
+									{{ product.one_year_change }}%
 								</span>
 							</div>
 						</div>
@@ -105,8 +105,8 @@
 			<div class="twelve columns">
 				<h3 class="feature-header">Lista de precios obtenidos</h3>
 				<ul class="inline-list">
-					<li><a href="{{url_for('show_product', product_id=product.id, extension='csv')}}">Ver como CSV</a></li>
-					<li><a href="{{url_for('show_product', product_id=product.id, extension='json')}}">Ver como JSON</a></li>
+					<li><a href="/product/{{product.id}}.csv">Ver como CSV</a></li>
+					<li><a href="/product/{{product.id}}.json">Ver como JSON</a></li>
 				</ul>
 				<table class="twelve">
 					<thead>
@@ -117,29 +117,26 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% set price_logs = product.price_logs|sort(attribute="fetched_date", reverse=True) %}
-						{% for price_log in price_logs[:25]%}
-							{% set float_change = price_log.change | float %}
-							{% set float_price = price_log.price | float %}
-							{% if float_change ==  0%}
+						{% for price_log in product.price_logs[:25]%}
+							{% if price_log.change ==  0%}
 							<tr id="{{ price_log.id }}" >
-							{% elif float_change > 0 %}
+							{% elif price_log.change > 0 %}
 							<tr class="row-change-positive" id="{{ price_log.id }}" >
 							{% else %}
 							<tr class="row-change-negative" id="{{ price_log.id }}" >
 							{% endif %}
 								<td><span data-date="{{price_log.fetched_date}} +0000">{{ price_log.fetched_date.strftime('%Y-%m-%d')}}</span></td>
-								<td><span class="price-currency">{{price_log.currency}}</span> {{ "%.2f" | format(float_price) }}</td>
+								<td><span class="price-currency">{{price_log.currency}}</span> {{ price_log.price }}</td>
 								
 								<td>
-									{% if float_change ==  0%}
+									{% if price_log.change ==  0%}
 									<span class="price-change-neutral">
-									{% elif float_change > 0 %}
+									{% elif price_log.change > 0 %}
 									<span class="price-change-positive">
 									{% else %}
 									<span class="price-change-negative">
 									{% endif %}
-										{{ "%.2f" | format(float_change) }}%
+										{{ price_log.change }}%
 									</span>
 								</td>
 							</tr>
@@ -182,7 +179,7 @@
 <script type="text/javascript">
 $(function() {
 
-	$.getJSON('{{url_for("get_price_logs", product_id=product.id)}}', function(data) {
+	$.getJSON('/product/{{product.id}}/price_logs.json', function(data) {
 		// Create the chart
 		window.chart = new Highcharts.StockChart({
 			chart : {

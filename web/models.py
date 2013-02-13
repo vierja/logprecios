@@ -52,21 +52,21 @@ class Product(db.Model):
     pub_date = db.Column(db.DateTime)
     updated_date = db.Column(db.DateTime)
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'))
-    brand = db.relationship('Brand', backref=db.backref('products', order_by=id), lazy='joined', join_depth=2)
+    brand = db.relationship('Brand', backref=db.backref('products', order_by=id), lazy="joined", join_depth=2)
 
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
-    source = db.relationship('Source', backref=db.backref('products', order_by=id), lazy='joined', join_depth=2)
+    source = db.relationship('Source', backref=db.backref('products', order_by=id), lazy="joined", join_depth=2)
 
     product_categories = db.relationship('ProductCategory', secondary=product_categories, 
-                                    backref=db.backref('products', lazy='immediate'))
+                                    backref=db.backref('products', lazy='dynamic'))
 
     original_img = db.Column(db.String)
 
     #Stats
-    one_month_change = db.Column(db.Numeric)
-    three_month_change = db.Column(db.Numeric)
-    six_month_change = db.Column(db.Numeric)
-    one_year_change = db.Column(db.Numeric)
+    one_month_change = db.Column(db.Numeric(7,2))
+    three_month_change = db.Column(db.Numeric(7,2))
+    six_month_change = db.Column(db.Numeric(7,2))
+    one_year_change = db.Column(db.Numeric(7,2))
 
 
     def __init__(self, url=None, pub_date=None):
@@ -179,22 +179,22 @@ class Product(db.Model):
 
     def price_logs_to_json(self):
         price_logs = [
-            [
+            [   
                 log.fetched_date,
                 float(log.price)
             ]
-                for log in self.price_logs
+                for log in self.price_logs[::-1]
         ]
         return DateTimeJSONEncoder().encode(price_logs)
 
 class PriceLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    price = db.Column(db.Numeric)
+    price = db.Column(db.Numeric(7,2))
     currency = db.Column(db.String)
     fetched_date = db.Column(db.DateTime)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
-    product = db.relationship('Product', backref=db.backref('price_logs', order_by=id))
-    change = db.Column(db.Numeric)
+    product = db.relationship('Product', backref=db.backref('price_logs', order_by=fetched_date.desc(), lazy='subquery'))
+    change = db.Column(db.Numeric(7,2))
 
     def __init__(self, price=None, currency=None, product=None, fetched_date=None):
         previous_log = PriceLog.query.filter_by(product=product).order_by(db.desc(PriceLog.fetched_date)).limit(1).all()
