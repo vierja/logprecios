@@ -52,13 +52,13 @@ class Product(db.Model):
     pub_date = db.Column(db.DateTime)
     updated_date = db.Column(db.DateTime)
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'))
-    brand = db.relationship('Brand', backref=db.backref('products', order_by=id))
+    brand = db.relationship('Brand', backref=db.backref('products', order_by=id), lazy='joined', join_depth=2)
 
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
-    source = db.relationship('Source', backref=db.backref('products', order_by=id))
+    source = db.relationship('Source', backref=db.backref('products', order_by=id), lazy='joined', join_depth=2)
 
     product_categories = db.relationship('ProductCategory', secondary=product_categories, 
-                                    backref=db.backref('products', lazy='dynamic'))
+                                    backref=db.backref('products', lazy='immediate'))
 
     original_img = db.Column(db.String)
 
