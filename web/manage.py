@@ -19,6 +19,7 @@ def initdb():
 
 @manager.command
 def migratedb():
+    """Creates a migration file and version."""
     migration = app.config.get('SQLALCHEMY_MIGRATE_REPO') + '/versions/%03d_migration.py' % (api.db_version(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO')) + 1)
     tmp_module = imp.new_module('old_model')
     old_model = api.create_model(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO'))
@@ -31,12 +32,14 @@ def migratedb():
 
 @manager.command
 def downgradedb():
+    """Downgrades to the previous version of the migrations."""
     v = api.db_version(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO'))
     api.downgrade(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO'), v - 1)
     print 'Current database version: ' + str(api.db_version(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO')))
 
 @manager.command
 def upgradedb():
+    """Upgrades to the last version of the migrations."""
     api.upgrade(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO'))
     print 'Current database version: ' + str(api.db_version(app.config.get('SQLALCHEMY_DATABASE_URI'), app.config.get('SQLALCHEMY_MIGRATE_REPO')))
 
@@ -48,8 +51,8 @@ def dropdb():
 @manager.command
 def resetdb():
     """Drops and creates all database tables."""
-    db.drop_all()
-    db.create_all()
+    dropdb()
+    initdb()
 
 @manager.command
 def canceljobs():
@@ -66,6 +69,7 @@ def populatedb():
 
 @manager.command
 def resettest():
+    """Drops DB, creates DB and populates the DB with the testing values"""
     dropdb()
     initdb()
     populatedb()
