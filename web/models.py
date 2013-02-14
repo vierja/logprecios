@@ -181,7 +181,7 @@ class Product(db.Model):
         price_logs = [
             [   
                 log.fetched_date,
-                float(log.price)
+                log.price
             ]
                 for log in self.price_logs[::-1]
         ]

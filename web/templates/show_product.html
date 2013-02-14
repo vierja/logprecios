@@ -189,13 +189,47 @@ $(function() {
 			rangeSelector : {
 				selected : 1
 			},
+
+			tooltip: {
+				valueDecimals: 2,
+				formatter:function(a,b,c){
+					var s = '<b>'+ Highcharts.dateFormat('%A, %b %e, %Y', this.x) +'</b>';
+					$.each(this.points, function(i, point) {
+						var prev = jQuery.inArray(point.x, point.series.processedXData)-1;
+						if(prev >= 0){
+							prev = point.series.points[prev];
+							var percent = (point.y - prev.y) *100 / prev.y;
+							var positive = false;
+							var negative = false;
+							if(percent > 0){
+								positive = true;
+								percent= '+' + percent;
+							} else if (percent<0){
+								negative = true;
+								percent = percent +'';
+							} else {
+								percent = percent +'';
+							}
+							percent = percent.substring(0,percent.indexOf('.')+3)+'%';
+							if(positive)
+								percent = '<span style="color:#DA5454">'+percent+'</span>';
+							else if (negative)
+								percent = '<span style="color:#1FC440">'+percent+'</span>';
+							s += '<br/>' + '<span style="color:' + point.series.color + '">' + point.series.name + '</span>: <b> $' + point.y + '</b> (' + percent + ')';
+						}
+						else{
+							s += '<br/>' + '<span style="color:' + point.series.color + '">' + point.series.name + '</span>: <b> $' + point.y + '</b>';
+						}
+					});
+
+					return s;
+				},
+				enable:true
+			},
 			
 			series : [{
 				name : '{{product.id}}',
-				data : data,
-				tooltip: {
-					valueDecimals: 2
-				}
+				data : data
 			}]
 		});
 	});
