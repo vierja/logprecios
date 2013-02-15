@@ -6,24 +6,17 @@ from rq import use_connection
 from rq_scheduler import Scheduler
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
+import newrelic.agent
 
 app = Flask(__name__)
+import errormator_client.ext.flask as errormator
+app = errormator.add_errormator(app)
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 oauth = OAuth()
 use_connection() # Use RQ's default Redis connection
 scheduler = Scheduler()
 toolbar = DebugToolbarExtension(app)
-
-facebook = oauth.remote_app('facebook',
-    base_url='https://graph.facebook.com/',
-    request_token_url=None,
-    access_token_url='/oauth/access_token',
-    authorize_url='https://www.facebook.com/dialog/oauth',
-    consumer_key='188477911223606',
-    consumer_secret='621413ddea2bcc5b2e83d42fc40495de',
-    request_token_params={'scope': 'email'}
-)
 
 def url_for_other_page(page):
     args = request.view_args.copy()
