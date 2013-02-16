@@ -61,7 +61,7 @@ class Product(db.Model):
                                     backref=db.backref('products', lazy='dynamic'))
 
     original_img = db.Column(db.String)
-
+    small_img = db.Column(db.String)
     #Stats
     one_month_change = db.Column(db.Numeric(7,2))
     three_month_change = db.Column(db.Numeric(7,2))
