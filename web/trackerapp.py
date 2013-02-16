@@ -13,9 +13,10 @@ app = errormator.add_errormator(app)
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 oauth = OAuth()
-use_connection() # Use RQ's default Redis connection
+use_connection()  # Use RQ's default Redis connection
 scheduler = Scheduler()
 toolbar = DebugToolbarExtension(app)
+
 
 def url_for_other_page(page):
     args = request.view_args.copy()
@@ -28,12 +29,15 @@ from models import Product, ProductCategory, PriceLog, Source
 
 ######### VIEWS
 
+
 @app.route('/')
 def homepage():
     products = Product.query.order_by(db.desc(Product.updated_date)).limit(25).all()
     number_of_logs = PriceLog.query.count()
     number_of_products = Product.query.count()
-    return render_template('home.html', products=products, number_of_logs=number_of_logs, number_of_products=number_of_products)
+    categories = ProductCategory.query.limit(15).all()
+    return render_template('home.html', products=products, number_of_logs=number_of_logs, number_of_products=number_of_products, categories=categories)
+
 
 @app.route('/new-product/', methods=['GET', 'POST'])
 def new_product():
@@ -47,7 +51,7 @@ def new_product():
             func=update_price,
             args=(product.id,),
             kwargs=None,
-            interval=86400, #One day # Time before the function is called again, in seconds
+            interval=86400,          # One day - Time before the function is called again, in seconds
             repeat=None              # Repeat this number of times (None means repeat forever)
         )
 
@@ -68,6 +72,7 @@ def show_product(product_id, extension=None):
 
     return redirect(url_for('show_product', product_id=product_id, extension=None))
 
+
 @app.route('/product/<int:product_id>/price_logs.json')
 def get_price_logs(product_id):
     product = Product.query.get_or_404(product_id)
@@ -82,5 +87,3 @@ def show_category(category_slug):
 
     print category
     return render_template('show_category.html', category=category)
-
-

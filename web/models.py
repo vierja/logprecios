@@ -7,6 +7,7 @@ from utils import slugify, DateTimeJSONEncoder
 
 ######### MODELS
 
+
 class Brand(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
@@ -16,6 +17,7 @@ class Brand(db.Model):
 
     def __repr__(self):
         return u"<Brand('%s')>" % self.name
+
 
 class ProductCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +30,7 @@ class ProductCategory(db.Model):
 
     def __repr__(self):
         return u"<ProductCategory('%s', '%d')>" % (self.name, self.id)
+
 
 class Source(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,7 +48,10 @@ product_categories = db.Table('product_categories',
     db.Column('product_category_id', db.Integer, db.ForeignKey('product.id'))
 )
 
+
 class Product(db.Model):
+    valid_domains = ['tinglesa.com.uy', 'devoto.com.uy', 'multiahorro.com.uy']
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     url = db.Column(db.String, unique=True)
@@ -57,17 +63,16 @@ class Product(db.Model):
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
     source = db.relationship('Source', backref=db.backref('products', order_by=id), lazy="joined", join_depth=2)
 
-    product_categories = db.relationship('ProductCategory', secondary=product_categories, 
+    product_categories = db.relationship('ProductCategory', secondary=product_categories,
                                     backref=db.backref('products', lazy='dynamic'))
 
     original_img = db.Column(db.String)
     small_img = db.Column(db.String)
     #Stats
-    one_month_change = db.Column(db.Numeric(7,2), default=0)
-    three_month_change = db.Column(db.Numeric(7,2), default=0)
-    six_month_change = db.Column(db.Numeric(7,2), default=0)
-    one_year_change = db.Column(db.Numeric(7,2), default=0)
-
+    one_month_change = db.Column(db.Numeric(7, 2), default=0)
+    three_month_change = db.Column(db.Numeric(7, 2), default=0)
+    six_month_change = db.Column(db.Numeric(7, 2), default=0)
+    one_year_change = db.Column(db.Numeric(7, 2), default=0)
 
     def __init__(self, url=None, pub_date=None):
         self.url = url
@@ -104,7 +109,7 @@ class Product(db.Model):
         source = Source.query.filter_by(domain=hostname).first()
         if source == None:
             source = Source(domain=hostname)
-            db.session.add(source) #el commit se hace cuando se guarda Product.
+            db.session.add(source)  # el commit se hace cuando se guarda Product.
         self.source = source
         self.updated_date = datetime.utcnow()
 
@@ -120,8 +125,9 @@ class Product(db.Model):
                 from_log = PriceLog.query.filter_by(product=self).filter(PriceLog.fetched_date.between(from_date, from_date + timedelta(days=1))).first()
 
         to_log = PriceLog.query.filter_by(product=self).filter(PriceLog.fetched_date.between(to_date, to_date + timedelta(days=1))).first()
-        if from_log is None or to_log is None: return 0
-        return (from_log.price - to_log.price)/to_log.price * 100
+        if from_log is None or to_log is None:
+            return 0
+        return (from_log.price - to_log.price) / to_log.price * 100
 
     def update_stats(self, from_log=None):
 
@@ -131,7 +137,7 @@ class Product(db.Model):
         self.three_month_change = self._get_change(to_date=date.today() - timedelta(days=90), from_log=from_log)
         self.six_month_change = self._get_change(to_date=date.today() - timedelta(days=180), from_log=from_log)
         self.one_year_change = self._get_change(to_date=date.today() - timedelta(days=365), from_log=from_log)
-        
+
         self.updated_date = datetime.utcnow()
 
     @property
@@ -150,7 +156,7 @@ class Product(db.Model):
         csv = ""
         csv += ','.join(['ID', 'PRICE', 'CURRENCY', 'FETCHED DATE', 'CHANGE', 'PRODUCT ID', 'URL']) + '\n'
         for price_log in self.price_logs:
-             csv += ','.join([str(price_log.id), "{:.2f}".format(float(price_log.price)), price_log.currency, str(price_log.fetched_date), "{:.2f}%".format(float(price_log.change)), str(self.id), self.url]) + '\n'
+            csv += ','.join([str(price_log.id), "{:.2f}".format(float(price_log.price)), price_log.currency, str(price_log.fetched_date), "{:.2f}%".format(float(price_log.change)), str(self.id), self.url]) + '\n'
 
         return csv
 
@@ -161,9 +167,9 @@ class Product(db.Model):
             "created_time": str(self.pub_date),
             "source": {
                 "id": self.source.id,
-                "domain": self.source.domain 
+                "domain": self.source.domain
             },
-            "price_logs":{
+            "price_logs": {
                 "data": [
                     {"id": log.id,
                      "amount": "{:.2f}".format(float(log.price)),
@@ -173,13 +179,13 @@ class Product(db.Model):
                     }
                         for log in self.price_logs
                 ]
-            } 
+            }
         }
         return json.dumps(js)
 
     def price_logs_to_json(self):
         price_logs = [
-            [   
+            [
                 log.fetched_date,
                 log.price
             ]
@@ -187,18 +193,19 @@ class Product(db.Model):
         ]
         return DateTimeJSONEncoder().encode(price_logs)
 
+
 class PriceLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    price = db.Column(db.Numeric(7,2))
+    price = db.Column(db.Numeric(7, 2))
     currency = db.Column(db.String)
     fetched_date = db.Column(db.DateTime)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product = db.relationship('Product', backref=db.backref('price_logs', order_by=fetched_date.desc(), lazy='subquery'))
-    change = db.Column(db.Numeric(7,2))
+    change = db.Column(db.Numeric(7, 2))
 
     def __init__(self, price=None, currency=None, product=None, fetched_date=None):
         previous_log = PriceLog.query.filter_by(product=product).order_by(db.desc(PriceLog.fetched_date)).limit(1).all()
-        
+
         if previous_log:
             previous_log = previous_log[0]
             self.change = ((price - previous_log.price) / previous_log.price) * 100
@@ -214,11 +221,9 @@ class PriceLog(db.Model):
         #Actualizo los valores.
         product.update_stats(from_log=self)
 
-
     def __repr__(self):
         return u"<PriceLog('%s', '%s')>" % (self.product.name, self.price)
 
 
 # def ShoppingCart(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
-

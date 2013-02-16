@@ -20,7 +20,6 @@
 				<div class="three columns">
 					<span class="th"><img src="{{product.original_img}}" /></span>
 				</div>
-
 				<div class="six columns">
 					<h6><a class="product-link" href="{{url_for('show_product', product_id=product.id)}}">{{product.name}}</a></h6>
 					<h6 class="subheader">{{product.source.domain}}</h6>
@@ -28,9 +27,6 @@
 						<dd>trackeando desde <span class="from-now" data-date="{{ product.pub_date }} +0000"></span></dd>
 						<dd>{{product.price_logs|length}} precios</dd>
 					</dl>
-					<p></p>
-					<p></p>
-
 				</div>
 				<div class="three columns">
 					<div class="row">
