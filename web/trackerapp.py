@@ -24,7 +24,7 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 from jobs.price_job import update_price
-from models import Product, ProductCategory, PriceLog
+from models import Product, ProductCategory, PriceLog, Source
 
 ######### VIEWS
 

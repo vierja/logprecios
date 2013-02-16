@@ -1,6 +1,6 @@
 from flask.ext.script import Manager
 from trackerapp import app, db, scheduler
-from populate import create_products_with_prices
+from populate_real import create_products_with_prices
 from migrate.versioning import api
 import os.path
 import imp

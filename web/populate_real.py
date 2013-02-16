@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
-from models import Product, Source
-from trackerapp import db, scheduler, update_price
+from trackerapp import db, scheduler, update_price, Product, Source
 from datetime import datetime
 
 
@@ -115,7 +114,6 @@ def create_products_with_prices():
         'http://www.multiahorro.com.uy/Product.aspx?p=143636',
         'http://www.multiahorro.com.uy/Product.aspx?p=171686',
         'http://www.multiahorro.com.uy/Product.aspx?p=143292',
-        'http://www.multiahorro.com.uy/Product.aspx?p=143598',
         'http://www.multiahorro.com.uy/Product.aspx?p=167306',
         'http://www.multiahorro.com.uy/Product.aspx?p=167300',
         'http://www.multiahorro.com.uy/Product.aspx?p=118222',
