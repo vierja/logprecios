@@ -1,4 +1,4 @@
-from flask import Flask, request, url_for, redirect, g, session, flash, \
+from flask import Flask, request, url_for, redirect, \
      abort, render_template, Response
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.oauth import OAuth
@@ -32,7 +32,7 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 from jobs.price_job import update_price
-from models import Product, User, Paste, ProductCategory, PriceLog
+from models import Product, ProductCategory, PriceLog
 
 ######### VIEWS
 
