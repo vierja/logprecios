@@ -23,5 +23,7 @@ class TestTiendaInglesaParser(unittest.TestCase):
     def test_leche_data(self):
         self.assertData("http://www.tinglesa.com.uy/producto.php?idarticulo=1531", "LECHE  CONAPROLE FRESCA ENTERA SACHET 1LT", "http://fotosti.e-tradeconsult.com/1200x900/VM000100/VM000161-1.jpg", ['Comestibles', u'Lácteos', 'Leches'])
 
+    def test_tarjeta_sd_data(self):
+        self.assertData("http://www.tinglesa.com.uy/producto.php?idarticulo=14610", "MEMORIA A-DATA MICRO SD / SD 4GB", "http://fotosti.e-tradeconsult.com/1200x900/VM221800/VM221871-1.jpg", [u"Electrónica", u"Computación", u"Cámaras - Filmadoras", u"Insumos"])
 if __name__ == '__main__':
     unittest.main()
