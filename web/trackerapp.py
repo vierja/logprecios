@@ -47,8 +47,8 @@ def new_product():
             func=update_price,
             args=(product.id,),
             kwargs=None,
-            interval=60,  # Time before the function is called again, in seconds
-            repeat=None   # Repeat this number of times (None means repeat forever)
+            interval=86400, #One day # Time before the function is called again, in seconds
+            repeat=None              # Repeat this number of times (None means repeat forever)
         )
 
         return redirect(url_for('show_product', product_id=product.id))
