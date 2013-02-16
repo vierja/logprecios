@@ -63,10 +63,10 @@ class Product(db.Model):
     original_img = db.Column(db.String)
     small_img = db.Column(db.String)
     #Stats
-    one_month_change = db.Column(db.Numeric(7,2))
-    three_month_change = db.Column(db.Numeric(7,2))
-    six_month_change = db.Column(db.Numeric(7,2))
-    one_year_change = db.Column(db.Numeric(7,2))
+    one_month_change = db.Column(db.Numeric(7,2), default=0)
+    three_month_change = db.Column(db.Numeric(7,2), default=0)
+    six_month_change = db.Column(db.Numeric(7,2), default=0)
+    one_year_change = db.Column(db.Numeric(7,2), default=0)
 
 
     def __init__(self, url=None, pub_date=None):
