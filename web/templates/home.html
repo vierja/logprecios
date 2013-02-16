@@ -43,7 +43,7 @@
 							{% else %}
 							<span class="big-percentage percentage-negative">
 							{% endif %}
-								{{ "%.2f" | format(product.one_month_change) }}%
+								{{ product.one_month_change }}%
 							</span>
 						</div>
 						<div class="twelve columns">
@@ -55,7 +55,7 @@
 							{% else %}
 							<span class="big-percentage percentage-negative">
 							{% endif %}
-								{{ "%.2f" | format(product.three_month_change) }}%
+								{{ product.three_month_change }}%
 							</span>
 						</div>
 					</div>

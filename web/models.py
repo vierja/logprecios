@@ -49,8 +49,8 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     url = db.Column(db.String, unique=True)
-    pub_date = db.Column(db.DateTime)
-    updated_date = db.Column(db.DateTime)
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'))
     brand = db.relationship('Brand', backref=db.backref('products', order_by=id), lazy="joined", join_depth=2)
 
@@ -69,13 +69,8 @@ class Product(db.Model):
     one_year_change = db.Column(db.Numeric(7,2), default=0)
 
 
-    def __init__(self, url=None, pub_date=None):
+    def __init__(self, url=None):
         self.url = url
-        if pub_date:
-            self.pub_date = pub_date
-        else:
-            self.pub_date = datetime.utcnow()
-        self.updated_date = datetime.utcnow()
 
     def __repr__(self):
         return u"<Product('%s', '%s')>" % (self.name, self.url)
@@ -131,8 +126,6 @@ class Product(db.Model):
         self.three_month_change = self._get_change(to_date=date.today() - timedelta(days=90), from_log=from_log)
         self.six_month_change = self._get_change(to_date=date.today() - timedelta(days=180), from_log=from_log)
         self.one_year_change = self._get_change(to_date=date.today() - timedelta(days=365), from_log=from_log)
-        
-        self.updated_date = datetime.utcnow()
 
     @property
     def last_3_month_change(self):
@@ -158,7 +151,7 @@ class Product(db.Model):
         js = {
             "id": self.id,
             "name": self.name,
-            "created_time": str(self.pub_date),
+            "created_time": str(self.created_on),
             "source": {
                 "id": self.source.id,
                 "domain": self.source.domain 
