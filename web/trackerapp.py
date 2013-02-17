@@ -8,8 +8,6 @@ from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
-import errormator_client.ext.flask as errormator
-app = errormator.add_errormator(app)
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 oauth = OAuth()
@@ -52,7 +50,8 @@ def new_product():
             args=(product.id,),
             kwargs=None,
             interval=86400,          # One day - Time before the function is called again, in seconds
-            repeat=None              # Repeat this number of times (None means repeat forever)
+            repeat=None,             # Repeat this number of times (None means repeat forever)
+            result_ttl=86400         # Se guardan los resultados 1 dia.
         )
 
         return redirect(url_for('show_product', product_id=product.id))
