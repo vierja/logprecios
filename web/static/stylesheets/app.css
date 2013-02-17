@@ -25,6 +25,12 @@ body{
 	background: #59616B;
 }
 
+.top-bar > ul .name h1 {
+	background: url(/static/images/logo_header.png) no-repeat;
+	text-shadow: 1px 1px #4D4D4D;
+	padding-left: 30px;
+}
+
 a{
 	color:#E66161;
 }
