@@ -1,20 +1,8 @@
 import unittest
-from tracker.parser.multiahorro import MultiAhorroParser
+from test_parser import TestParser
 
-class TestMultiAhorroParser(unittest.TestCase):
 
-    def assertValue(self, url, value):
-        parser = MultiAhorroParser(url)
-        site_value = parser.get_price()
-        assert site_value == value
-
-    def assertData(self, url, name, image_url, categories):
-        parser = MultiAhorroParser(url)
-        res = parser.get_data()
-        assert res['name'] == name
-        assert res['image_url'] == image_url
-        assert all([x in res['categories'] for x in categories])
-        assert all([x in categories for x in res['categories']])
+class TestMultiAhorroParser(TestParser):
 
     def test_leche_value(self):
         self.assertValue("http://www.multiahorro.com.uy/Product.aspx?p=94295", 16)
