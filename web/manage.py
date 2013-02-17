@@ -1,6 +1,7 @@
 from flask.ext.script import Manager
 from trackerapp import app, db, scheduler
 from populate_real import create_products_with_prices
+from populate_test import create_products_with_prices as create_products_with_prices_test
 from migrate.versioning import api
 import os.path
 import imp
@@ -66,6 +67,11 @@ def canceljobs():
 def populatedb():
     """Adds items with random prices to DB"""
     create_products_with_prices()
+
+@manager.command
+def populatedb_test():
+    """Adds test items with random prices to DB"""
+    create_products_with_prices_test()
 
 @manager.command
 def resettest():
