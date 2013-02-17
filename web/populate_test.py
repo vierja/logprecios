@@ -128,7 +128,6 @@ def create_products_with_prices():
     for url_list in list_of_lists:
         for url in url_list:
             p = Product(url)
-            p.get_data()
             p.name += ' - TESTING'
             print "Adding:", url
             db.session.add(p)
