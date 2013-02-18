@@ -6,6 +6,7 @@ from rq import use_connection
 from rq_scheduler import Scheduler
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
+from tracker.tracker import get_parser
 
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
@@ -40,8 +41,18 @@ def homepage():
 @app.route('/new-product/', methods=['GET', 'POST'])
 def new_product():
     if request.method == 'POST' and request.form['url']:
-        product = Product(request.form['url'])
-        product.get_data()
+
+        parser = get_parser(request.form['url'])
+        if parser is None:
+            return abort(400)
+
+        url = parser.minify()
+        product = Product.query.filter_by(url=url).first()
+        if product:
+            #add flash message.
+            return render_template('new_product.html')
+
+        product = Product(url, parser=parser)
         db.session.add(product)
         db.session.commit()
         scheduler.schedule(

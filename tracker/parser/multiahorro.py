@@ -26,8 +26,8 @@ class MultiAhorroParser(Parser):
         d = pq(url=self.url, opener=self.opener)
         product_name = d("h1:first").text()
         product_name = re.sub(' +', ' ', product_name)
-        if d("#ctl00_ContentPlaceHolder1_lblUnitType").text().lower() == 'kg':
-            product_name += " 1 Kg"
+        # if d("#ctl00_ContentPlaceHolder1_lblUnitType").text().lower() == 'kg':
+        #     product_name += " 1 Kg"
         incomplete_link = d("#ctl00_ContentPlaceHolder1_imgProductImage").attr("src")
         clean_link = urljoin(self.url, incomplete_link[1:])
         #Categorias

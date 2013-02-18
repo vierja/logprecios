@@ -74,22 +74,23 @@ class Product(db.Model):
     six_month_change = db.Column(db.Numeric(7, 2), default=0)
     one_year_change = db.Column(db.Numeric(7, 2), default=0)
 
-    def __init__(self, url=None, pub_date=None):
-        self.url = url
-        if pub_date:
-            self.pub_date = pub_date
-        else:
-            self.pub_date = datetime.utcnow()
-        self.updated_date = datetime.utcnow()
-
     def __repr__(self):
         return u"<Product('%s', '%s')>" % (self.name, self.url)
 
-    def get_data(self):
-        parser = get_parser(self.url)
+    def __init__(self, url, parser):
+        self.pub_date = datetime.utcnow()
+        self.updated_date = datetime.utcnow()
+        self.url = url
+
         data = parser.get_data()
         self.name = data['name']
         self.original_img = data['image_url']
+
+        source = Source.query.filter_by(domain=data['hostname']).first()
+        if source == None:
+            source = Source(domain=data['hostname'])
+            db.session.add(source)  # el commit se hace cuando se guarda Product.
+        self.source = source
 
         #Creo las categorias si no existen.
         categories = []
@@ -98,20 +99,7 @@ class Product(db.Model):
             if category is None:
                 category = ProductCategory(name=category_name)
             categories += [category]
-
         self.product_categories = categories
-
-        #Busco o creo source
-        hostname = urlparse(self.url).hostname
-        if hostname.startswith('www.'):
-            hostname = hostname[4:]
-
-        source = Source.query.filter_by(domain=hostname).first()
-        if source == None:
-            source = Source(domain=hostname)
-            db.session.add(source)  # el commit se hace cuando se guarda Product.
-        self.source = source
-        self.updated_date = datetime.utcnow()
 
     def get_price(self):
         parser = get_parser(self.url)

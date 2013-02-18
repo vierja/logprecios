@@ -7,6 +7,9 @@ from parser.multiahorro import MultiAhorroParser
 from parser.tiendainglesa import TiendaInglesaParser
 
 def get_parser(url):
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = 'http://' + url
+
     if "devoto" in url.lower():
         return DevotoParser(url)
     if "tinglesa" in url.lower():
