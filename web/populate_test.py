@@ -3,14 +3,22 @@ from models import Product, PriceLog, Source
 from random import choice
 from trackerapp import db
 from datetime import date, timedelta
+from tracker.tracker import get_parser
 
 
-increments = [-1,-1,-2,-2,-2,-2,-3,-3,-3,-3,-4,-4,-4,-5,-5,-5,-10,-15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,10,15]
+increments = [-1, -1, -2, -2, -2, -2, -3, -3, -3, -3, -4, -4, -4, -5, -5, -5, -10, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 10, 15]
+
 
 def create_products_with_prices():
     print "Creating sources"
     source = Source(domain="tinglesa.com.uy")
-    db.session.add(source) #el commit se hace cuando se guarda Product.
+    db.session.add(source)  # el commit se hace cuando se guarda Product.
+
+    source = Source(domain="devoto.com.uy")
+    db.session.add(source)
+
+    source = Source(domain="multiahorro.com.uy")
+    db.session.add(source)
     db.session.commit()
 
     print "Creating products with prices."
@@ -127,7 +135,8 @@ def create_products_with_prices():
 
     for url_list in list_of_lists:
         for url in url_list:
-            p = Product(url)
+            parser = get_parser(url)
+            p = Product(url, parser=parser)
             p.name += ' - TESTING'
             print "Adding:", url
             db.session.add(p)
@@ -142,4 +151,3 @@ def create_products_with_prices():
                 price = price if price > 0 else 1
                 fetched_date = fetched_date + timedelta(days=1)
 
-    

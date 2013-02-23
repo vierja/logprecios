@@ -26,8 +26,20 @@
 
 					</li>
 					<li class="description">
-						<div class="row">	
-							<div class="six columns">
+						<div class="row">
+							<div class="four columns">
+								<h6 class="subheader">Últimos 30 días</h6>
+								{% if product.one_month_change == 0 %}
+								<span class="big-percentage percentage-neutral">
+								{% elif product.one_month_change > 0 %}
+								<span class="big-percentage percentage-positive">
+								{% else %}
+								<span class="big-percentage percentage-negative">
+								{% endif %}
+									{{ product.one_month_change }}%
+								</span>
+							</div>
+							<div class="four columns">
 								<h6 class="subheader">Últimos 90 días</h6>
 								{% if product.three_month_change == 0 %}
 								<span class="big-percentage percentage-neutral">
@@ -39,7 +51,7 @@
 									{{ product.three_month_change }}%
 								</span>
 							</div>
-							<div class="six columns">
+							<div class="four columns">
 								<h6 class="subheader">Último año</h6>
 								{% if product.one_year_change == 0 %}
 								<span class="big-percentage percentage-neutral">
@@ -69,7 +81,7 @@
 				<div id="container" style="height: 500px; min-width: 500px"></div>
 			</div>
 		</div>
-		<hr />
+<!-- 		<hr />
 		<div class="row">
 			<h3 class="feature-header">Estadísticas</h3>
 			<div class="three columns">
@@ -99,7 +111,7 @@
 					<p>Content...</p>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<hr />
 		<div class="row">
 			<div class="twelve columns">
@@ -178,8 +190,7 @@
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script type="text/javascript">
 $(function() {
-
-	$.getJSON('/product/{{product.id}}/price_logs.json', function(data) {
+	$.getJSON('/product/{{product.id}}/price_logs.chart', function(data) {
 		// Create the chart
 		window.chart = new Highcharts.StockChart({
 			chart : {
@@ -198,7 +209,7 @@ $(function() {
 						var prev = jQuery.inArray(point.x, point.series.processedXData)-1;
 						if(prev >= 0){
 							prev = point.series.points[prev];
-							var percent = (point.y - prev.y) *100 / prev.y;
+							var percent = ((point.y - prev.y) * 100) / prev.y;
 							var positive = false;
 							var negative = false;
 							if(percent > 0){
@@ -221,12 +232,10 @@ $(function() {
 							s += '<br/>' + '<span style="color:' + point.series.color + '">' + point.series.name + '</span>: <b> $' + point.y + '</b>';
 						}
 					});
-
 					return s;
 				},
 				enable:true
 			},
-			
 			series : [{
 				name : '{{product.id}}',
 				data : data
