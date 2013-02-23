@@ -53,6 +53,9 @@
       <section>
        
          <ul class="right">
+          {% if g.user %}
+            <li>{{ g.user.display_name }}</li>
+            {% endif %}
             <li>
               <a href="{{url_for('new_product')}}">Agregar producto</a>
           </li>

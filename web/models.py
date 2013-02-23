@@ -1,11 +1,18 @@
 from datetime import datetime, date, timedelta
 from trackerapp import db
 from tracker.tracker import get_parser
-from urlparse import urlparse
 import json
 from utils import slugify, DateTimeJSONEncoder
+import requests
 
 ######### MODELS
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    display_name = db.Column(db.String(120))
+    fb_id = db.Column(db.String(30), unique=True)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
 
 class Brand(db.Model):
@@ -82,13 +89,18 @@ class Product(db.Model):
         self.updated_date = datetime.utcnow()
         self.url = url
 
-        data = parser.get_data()
+        result = requests.get(self.url, timeout=30, allow_redirects=False)
+        if result.status_code >= 300:
+            raise ValueError("Invalid Url.")
+
+        data = parser.get_data(content=result.text)
         self.name = data['name']
         self.original_img = data['image_url']
 
-        source = Source.query.filter_by(domain=data['hostname']).first()
+        hostname = parser.get_hostname()
+        source = Source.query.filter_by(domain=hostname).first()
         if source == None:
-            source = Source(domain=data['hostname'])
+            source = Source(domain=hostname)
             db.session.add(source)  # el commit se hace cuando se guarda Product.
         self.source = source
 
@@ -113,6 +125,9 @@ class Product(db.Model):
                 from_log = PriceLog.query.filter_by(product=self).filter(PriceLog.fetched_date.between(from_date, from_date + timedelta(days=1))).first()
 
         to_log = PriceLog.query.filter_by(product=self).filter(PriceLog.fetched_date.between(to_date, to_date + timedelta(days=1))).first()
+        if to_log is None:
+            to_log = PriceLog.query.filter_by(product=self).order_by(db.asc(PriceLog.fetched_date)).first()
+
         if from_log is None or to_log is None:
             return 0
         return (from_log.price - to_log.price) / to_log.price * 100
@@ -172,6 +187,22 @@ class Product(db.Model):
         return json.dumps(js)
 
     def price_logs_to_json(self):
+        js = {
+            "price_logs": {
+                "data": [
+                    {"id": log.id,
+                     "amount": "{:.2f}".format(float(log.price)),
+                     "currency":log.currency,
+                     "change": "{:.2f}%".format(float(log.change)),
+                     "fetched_time": str(log.fetched_date)
+                    }
+                        for log in self.price_logs
+                ]
+            }
+        }
+        return json.dumps(js)
+
+    def price_logs_to_chart(self):
         price_logs = [
             [
                 log.fetched_date,
@@ -190,6 +221,7 @@ class PriceLog(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product = db.relationship('Product', backref=db.backref('price_logs', order_by=fetched_date.desc(), lazy='subquery'))
     change = db.Column(db.Numeric(7, 2))
+    html_file_name = db.Column(db.String)
 
     def __init__(self, price=None, currency=None, product=None, fetched_date=None):
         previous_log = PriceLog.query.filter_by(product=product).order_by(db.desc(PriceLog.fetched_date)).limit(1).all()
@@ -211,6 +243,24 @@ class PriceLog(db.Model):
 
     def __repr__(self):
         return u"<PriceLog('%s', '%s')>" % (self.product.name, self.price)
+
+
+class PriceLogError(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    error_date = db.Column(db.DateTime)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    product = db.relationship('Product')
+    message = db.Column(db.String)
+    job_id = db.Column(db.String)
+    return_value = db.Column(db.String)
+
+    def __repr__(self):
+        return u"<PriceLogError('%s', price_log_id='%s')>" % (self.id, self.price_log_id)
+
+    def __init__(self, product, job_id):
+        self.product = product
+        self.job_id = job_id
+        self.error_date = datetime.utcnow()
 
 
 # def ShoppingCart(db.Model):

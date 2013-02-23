@@ -5,14 +5,26 @@ import datetime
 import time
 import decimal
 
+
 class DateTimeJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
-            return int(time.mktime(obj.timetuple())*1e3 + obj.microsecond/1e3)
+            return int(time.mktime(obj.timetuple()) * 1e3 + obj.microsecond / 1e3)
         elif isinstance(obj, decimal.Decimal):
             return float(obj)
         else:
             return super(DateTimeJSONEncoder, self).default(obj)
+
+
+class DateTimeChartJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return "Date.UTC(%d,%d,%d)" % (obj.year, obj.month, obj.day)
+        elif isinstance(obj, decimal.Decimal):
+            return float(obj)
+        else:
+            return super(DateTimeChartJSONEncoder, self).default(obj)
+
 
 def slugify(value):
     """

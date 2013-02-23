@@ -7,8 +7,11 @@ from parser import Parser
 class DevotoParser(Parser):
     def __init__(self, *args, **kwargs):
         super(DevotoParser, self).__init__(*args, **kwargs)
+        if not self.url_is_valid():
+            raise ValueError("Invalid URL")
+        self.url = self.minify_url()
 
-    def minify(self):
+    def minify_url(self):
         url_parsed = urlparse(self.url)
         #['http', 'www.tinglesa.com.uy', '/producto.php', '--path--', 'idarticulo=3148&trash=1', 'tag']
         url_list = list(url_parsed)
@@ -29,39 +32,29 @@ class DevotoParser(Parser):
     def url_is_valid(self):
         #Nos aseguramos que la url sea valida
         o = urlparse(self.url)
-        assert o.hostname == "devoto.com.uy" or o.hostname == "www.devoto.com.uy"
         path = o.path.split("/")[-1]
-        assert path == "hdetalleproductop"
-        hostname = o.hostname
-        if hostname.startswith('www.'):
-            hostname = hostname[4:]
-        return hostname
+        return ((o.hostname == "devoto.com.uy" or o.hostname == "www.devoto.com.uy") and
+                path == "hdetalleproductop")
 
-    def get_data(self):
-        hostname = self.url_is_valid()
-        d = pq(url=self.url, opener=self.opener)
+    def get_data(self, content=None):
+        if content is None:
+            d = pq(url=self.url, opener=self.opener)
+        else:
+            d = pq(content)
+
+        # Product name
         product_name = d("h1").text()
+        # Product image
         incomplete_link = d("img[class=imgproducto]").attr("src")
         clean_link = "http://" + urlparse(self.url).hostname + incomplete_link
-        #Categorias
+        # Product categories
         categories = d(".barnavega").text().split("/")[1:-1]
         categories = [a.strip() for a in categories]
+        # Product price
+        price_with_currency = d('h1').parent().find("span").eq(1).text()
+        # Precio se obtiene "$U 33.00"
+        price_str = price_with_currency.strip().split(" ")[1]
+        assert is_number(price_str)
+        price = to_decimal(price_str)
 
-        return {'name': product_name, "image_url": clean_link, "categories": categories, "hostname": hostname}
-
-    def get_price(self):
-        """
-        Obtiene el valor de el producto con url `url`.
-        La url debe de ser del tipo
-        `http://www.devoto.com.uy/mvdcommerce/servlet/hdetalleproductop?2,1,6570,0,269,1`
-        para ser procesada.
-        """
-        self.url_is_valid()
-        d = pq(url=self.url, opener=self.opener)
-        precio_con_moneda = d('h1').parent().find("span").eq(1).text()
-        #Precio se obtiene "$U 33.00"
-        precio = precio_con_moneda.strip().split(" ")[1]
-
-        assert is_number(precio)
-
-        return to_decimal(precio)
+        return {'name': product_name, "price": price, "image_url": clean_link, "categories": categories}
