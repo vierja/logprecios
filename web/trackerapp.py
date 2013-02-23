@@ -71,8 +71,8 @@ def new_product():
                 scheduled_time=datetime.now(),
                 func=update_price,
                 args=(product.id,),
-                kwargs={"save_html_route": "html"},
-                interval=30,             # One day - Time before the function is called again, in seconds
+                kwargs={"save_html_route": "prices_html"},
+                interval=86400,          # One day - Time before the function is called again, in seconds
                 repeat=None,             # Repeat this number of times (None means repeat forever)
                 result_ttl=86400         # Se guardan los resultados 1 dia.
             )
