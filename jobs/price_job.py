@@ -6,7 +6,7 @@ from datetime import datetime
 import os
 
 
-def update_price(product_id, product_currency='UYP', save_html_route=None, recursion_limit=0, e=None):
+def update_price(product_id, product_currency='UYP', save_html_route='prices_html', recursion_limit=0, e=None):
 
     if recursion_limit > 5:
         raise e
@@ -52,14 +52,14 @@ def update_price(product_id, product_currency='UYP', save_html_route=None, recur
             product.original_img = product_data['image_url']
             db.session.add(product)
 
-        new_price = 8#product_data['price']
+        new_price = product_data['price']
         price_log = PriceLog(new_price, product_currency, product)
 
-        if save_html_route is not None:
-            """
-            Si se quiere guardar un archivo entonces se guardan los datos en un .gz
-            y se guarda el nombre del archivo en la tabla.
-            """
+        """
+        Si se quiere guardar un archivo entonces se guardan los datos en un .gz
+        y se guarda el nombre del archivo en la tabla.
+        """
+        try:
             import gzip
             now = datetime.utcnow()
             folder_path = "%s/%s" % (os.path.abspath(save_html_route), now.strftime("%Y-%m-%d"))
@@ -70,6 +70,9 @@ def update_price(product_id, product_currency='UYP', save_html_route=None, recur
             f.write(result.content)
             f.close()
             price_log.html_file_name = file_name
+        except:
+            job.meta['error'] = 'Error while saving gz.'
+            job.save()
 
         db.session.add(price_log)
         db.session.commit()
