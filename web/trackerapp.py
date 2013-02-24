@@ -49,6 +49,24 @@ def homepage():
     return render_template('home.html', products=products, number_of_logs=number_of_logs, number_of_products=number_of_products, categories=categories)
 
 
+@app.route('/stats')
+def stats():
+    avg_logs_by_domain = db.session.execute('''
+        SELECT date_trunc('day', fetched_date) AS "day" , count(*) AS "updates", domain as "source", trim(to_char(avg(change),'99999999999999999D99')) as "avg_change"
+        FROM price_log, product, source
+        WHERE product_id = product.id and source_id = source.id
+        GROUP BY 1,3
+        ORDER BY 1;''')
+
+    avg_changes_logs_by_domain = db.session.execute('''
+        SELECT date_trunc('day', fetched_date) AS "day" , count(*) AS "updates", domain as "source", trim(to_char(avg(change),'99999999999999999D99')) as "avg_change"
+        FROM price_log, product, source
+        WHERE product_id = product.id and source_id = source.id AND change <> 0
+        GROUP BY 1,3
+        ORDER BY 1;''')
+    return render_template('stats.html', avg_logs_by_domain=avg_logs_by_domain, avg_changes_logs_by_domain=avg_changes_logs_by_domain)
+
+
 @app.route('/new-product/', methods=['GET', 'POST'])
 def new_product():
     if request.method == 'POST' and request.form['url']:
