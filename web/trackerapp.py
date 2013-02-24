@@ -52,14 +52,14 @@ def homepage():
 @app.route('/stats')
 def stats():
     avg_logs_by_domain = db.session.execute('''
-        SELECT date_trunc('day', fetched_date) AS "day" , count(*) AS "updates", domain as "source", trim(to_char(avg(change),'99999999999999999D99')) as "avg_change"
+        SELECT date_trunc('day', fetched_date) AS "day" , count(*) AS "updates", domain as "source", avg(change) as "avg_change"
         FROM price_log, product, source
         WHERE product_id = product.id and source_id = source.id
         GROUP BY 1,3
         ORDER BY 1;''')
 
     avg_changes_logs_by_domain = db.session.execute('''
-        SELECT date_trunc('day', fetched_date) AS "day" , count(*) AS "updates", domain as "source", trim(to_char(avg(change),'99999999999999999D99')) as "avg_change"
+        SELECT date_trunc('day', fetched_date) AS "day" , count(*) AS "updates", domain as "source", avg(change) as "avg_change"
         FROM price_log, product, source
         WHERE product_id = product.id and source_id = source.id AND change <> 0
         GROUP BY 1,3

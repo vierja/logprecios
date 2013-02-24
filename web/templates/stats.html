@@ -35,7 +35,7 @@
 							{% else %}
 							<span class="price-change-negative">
 							{% endif %}
-								{{ row.avg_change }}%
+								{{'%0.2f'| format(row.avg_change|float)}}%
 							</span>
 						</td>
 					</tr>
@@ -70,7 +70,7 @@
 							{% else %}
 							<span class="price-change-negative">
 							{% endif %}
-								{{ row.avg_change }}%
+								{{'%0.2f'| format(row.avg_change|float)}}%
 							</span>
 						</td>
 					</tr>
