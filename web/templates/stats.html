@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Estadisticas{% endblock %}
+{% block breadcrumbs %}
+	<div class="row">
+		<ul class="breadcrumbs">
+			<li><a href="/"><span>Inicio</span></a></li>
+			<li class="current">Stats</li>
+		</ul>
+	</div>
+{% endblock %}
+{% block content %}
+<div class="row">
+	<div class="twelve columns">
+		<h3 class="feature-header">Logs obtenidos por día</h3>
+		<table class="twelve">
+			<thead>
+				<tr>
+					<th>Día</th>
+					<th>Logs obtenidos</th>
+					<th>Fuente</th>
+					<th>Promedio cambio</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in avg_logs_by_domain%}
+					<tr>
+						<td><span data-date="{{row.Day}}">{{row.day.strftime('%Y-%m-%d')}}</span></td>
+						<td>{{ row.updates }}</td>
+						<td>{{ row.source }}</td>
+						<td>
+							{% if row.avg_change ==  0%}
+							<span class="price-change-neutral">
+							{% elif row.avg_change > 0 %}
+							<span class="price-change-positive">
+							{% else %}
+							<span class="price-change-negative">
+							{% endif %}
+								{{ row.avg_change }}%
+							</span>
+						</td>
+					</tr>
+				{% endfor %}
+		  </tbody>
+		</table>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<h3 class="feature-header">Cambios encontrados por día</h3>
+		<table class="twelve">
+			<thead>
+				<tr>
+					<th>Día</th>
+					<th># cambios</th>
+					<th>Fuente</th>
+					<th>Cambio promedio</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in avg_changes_logs_by_domain%}
+					<tr>
+						<td><span data-date="{{row.Day}}">{{row.day.strftime('%Y-%m-%d')}}</span></td>
+						<td>{{ row.updates }}</td>
+						<td>{{ row.source }}</td>
+						<td>
+							{% if row.avg_change ==  0%}
+							<span class="price-change-neutral">
+							{% elif row.avg_change > 0 %}
+							<span class="price-change-positive">
+							{% else %}
+							<span class="price-change-negative">
+							{% endif %}
+								{{ row.avg_change }}%
+							</span>
+						</td>
+					</tr>
+				{% endfor %}
+		  </tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
