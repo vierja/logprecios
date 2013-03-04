@@ -64,7 +64,7 @@ class Product(db.Model):
     url = db.Column(db.String, unique=True)
     pub_date = db.Column(db.DateTime)
     updated_date = db.Column(db.DateTime)
-    tracking = db.Column(db.Boolean, default=True, nullable=False)
+    tracking = db.Column(db.Boolean, default=True)
     tracking_time = db.Column(db.DateTime)
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'))
     brand = db.relationship('Brand', backref=db.backref('products', order_by=id), lazy="joined", join_depth=2)
