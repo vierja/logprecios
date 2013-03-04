@@ -64,6 +64,8 @@ class Product(db.Model):
     url = db.Column(db.String, unique=True)
     pub_date = db.Column(db.DateTime)
     updated_date = db.Column(db.DateTime)
+    tracking = db.Column(db.Boolean, default=True, nullable=False)
+    tracking_time = db.Column(db.DateTime)
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'))
     brand = db.relationship('Brand', backref=db.backref('products', order_by=id), lazy="joined", join_depth=2)
 
@@ -84,10 +86,14 @@ class Product(db.Model):
     def __repr__(self):
         return u"<Product('%s', '%s')>" % (self.name, self.url)
 
-    def __init__(self, url, parser):
+    def __init__(self, url, parser, tracking_time=None):
         self.pub_date = datetime.utcnow()
         self.updated_date = datetime.utcnow()
         self.url = url
+        if tracking_time is None:
+            self.tracking_time = datetime.utcnow()
+        else:
+            self.tracking_time = tracking_time
 
         result = requests.get(self.url, timeout=30, allow_redirects=False)
         if result.status_code >= 300:
@@ -104,18 +110,19 @@ class Product(db.Model):
             db.session.add(source)  # el commit se hace cuando se guarda Product.
         self.source = source
 
-        #Creo las categorias si no existen.
+        # Creo las categorias si no existen.
         categories = []
         for category_name in data['categories']:
             category = ProductCategory.query.filter_by(slug=slugify(category_name)).first()
             if category is None:
                 category = ProductCategory(name=category_name)
+                db.session.add(category)
             categories += [category]
         self.product_categories = categories
 
-    def get_price(self):
-        parser = get_parser(self.url)
-        return parser.get_price()
+        # Guardo el precio obtenido.
+        price_log = PriceLog(data['price'], "UYP", self)
+        db.session.add(price_log)
 
     def _get_change(self, to_date=None, from_date=None, from_log=None):
         if from_log is None:
@@ -219,7 +226,7 @@ class PriceLog(db.Model):
     currency = db.Column(db.String)
     fetched_date = db.Column(db.DateTime)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
-    product = db.relationship('Product', backref=db.backref('price_logs', order_by=fetched_date.desc(), lazy='subquery'))
+    product = db.relationship('Product', backref=db.backref('price_logs', order_by=fetched_date.desc(), lazy='dynamic'))
     change = db.Column(db.Numeric(7, 2))
     html_file_name = db.Column(db.String)
 
